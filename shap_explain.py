@@ -95,3 +95,5 @@ def shap_explain():
                         st_shap(shap.plots.scatter(shap_values[:,column], color=shap_values))
         if selected_model is not None and selected_model=='KernelExplainer':
             pass
+    else:
+        st.success('Please select your source data to get start')

@@ -53,8 +53,8 @@ def mycam():
                             cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2,
                             lineType=cv2.LINE_AA)
             return img
-        model = torch.hub.load('ultralytics/yolov5', 'custom', path=model_path.name)
-        # model=torch.hub.load('C:/Users/haomo/checksck/kittidata/yolov5','custom',path=r'C:\Users\haomo\checksck\kittidata\yolov5\runs\train\exp10\weights\best.pt',source='local')
+        #model = torch.hub.load('ultralytics/yolov5', 'custom', path=model_path.name)
+        model=torch.hub.load('C:/Users/haomo/checksck/kittidata/yolov5','custom',path=r'C:\Users\haomo\checksck\kittidata\yolov5\runs\train\exp10\weights\best.pt',source='local')
         model.eval()
         model.cpu()
         target_layers = [model.model.model.model[-2]]
@@ -72,7 +72,7 @@ def mycam():
         boxes, colors, names = parse_detections(results)
         detections = draw_detections(boxes, colors, names, rgb_img.copy())
         cam = EigenCAM(model, target_layers, use_cuda=False)
-        grayscale_cam = cam(tensor)[0, :, :]
+        grayscale_cam = cam(tensor,eigen_smooth=True,aug_smooth=True)[0, :, :]
         cam_image = show_cam_on_image(img, grayscale_cam, use_rgb=True)
         def renormalize_cam_in_bounding_boxes(boxes, colors, names, image_float_np, grayscale_cam):
             renormalized_cam = np.zeros(grayscale_cam.shape, dtype=np.float32)
@@ -87,3 +87,5 @@ def mycam():
         st.image(Image.fromarray(detections))
         st.image(Image.fromarray(cam_image))
         st.image(Image.fromarray(renormalized_cam_image))
+    else:
+        st.success('Please select your source data to get start')

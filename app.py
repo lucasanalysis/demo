@@ -26,7 +26,7 @@ def Home():
         - Ask a question in our [community
             forums](https://discuss.streamlit.io)
         ### See how to use this app
-        - Instructions [click here](https://alidocs.dingtalk.com/i/team/e3RmQygAV34QPmaP/docs/e3RmQxdEyqEPPXaP# 「app使用说明」)
+        - Instructions [click here](https://alidocs.dingtalk.com/i/nodes/B6L5QAmawMPJMjrENOBd8q1z09lnK3kb)
     """
     )
 page_names_to_funcs = {

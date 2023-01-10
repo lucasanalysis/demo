@@ -4,7 +4,6 @@ import pandas as pd
 from bokeh.plotting import figure, show, output_notebook,output_file
 from bokeh.models import HoverTool, ColumnDataSource, CategoricalColorMapper
 from bokeh.palettes import Spectral10,Inferno10,Paired3,Category10_10
-import h5py
 from io import BytesIO
 import io
 from PIL import Image
@@ -29,28 +28,30 @@ def mytsne():
     no_plot=st.sidebar.selectbox('Please select the number of datasets',[1,2])
     st.header("TSNE Visualizer")
     if no_plot==1:
-        uploaded_file = st.sidebar.file_uploader("Choose a file(pth)")
+        uploaded_file = st.sidebar.file_uploader("Choose a file")
         if uploaded_file is not None:
-            if 'pth' in uploaded_file.name:
-                df=torch.load(uploaded_file)
-                labels=df['label']
-                path=df['path']
-                if 'embedding' in df.keys():
-                    feature=df['embedding'].numpy()
-                else:
-                    def clip_cache(path):
-                        device = "cuda" if torch.cuda.is_available() else "cpu"
-                        model, preprocess = clip.load("ViT-B/32", device=device)
-                        embedding=[]
-                        for i in tqdm(range(len(path))):
-                            image = preprocess(Image.open(path[i])).unsqueeze(0).to(device)
-                            with torch.no_grad():
-                                image_features = model.encode_image(image)
-                                embedding.append(image_features[0].numpy().reshape(1,512))
-                        feature=np.array([embedding[i].reshape(1,-1)[0] for i in range(len(path))])
-                        return feature
-                    clip_cache_st=st.cache(clip_cache)
-                    feature=clip_cache_st(path)
+            df=torch.load(uploaded_file)
+            labels=df['label']
+            path=df['path']
+            if 'embedding' in df.keys():
+              if type(df['embedding'])==torch.Tensor:
+                feature=df['embedding'].numpy()
+              elif type(df['embedding'])==np.ndarray:
+                feature=df['embedding']
+            else:
+                def clip_cache(path):
+                    device = "cuda" if torch.cuda.is_available() else "cpu"
+                    model, preprocess = clip.load("ViT-B/32", device=device)
+                    embedding=[]
+                    for i in tqdm(range(len(path))):
+                        image = preprocess(Image.open(path[i])).unsqueeze(0).to(device)
+                        with torch.no_grad():
+                            image_features = model.encode_image(image)
+                            embedding.append(image_features[0].numpy().reshape(1,512))
+                    feature=np.array([embedding[i].reshape(1,-1)[0] for i in range(len(path))])
+                    return feature
+                clip_cache_st=st.cache(clip_cache)
+                feature=clip_cache_st(path)
 
             # elif 'csv' in uploaded_file.name:
             #     df=pd.read_csv(uploaded_file)
@@ -271,30 +272,32 @@ def mytsne():
             #         image_np=save_image_to_array(path)
             #     plot_tsne_single_3d(image_np,tsne,labels,n_components = num_components)      
     elif no_plot==2:
-        uploaded_file1 = st.sidebar.file_uploader("Choose the first file(pth)")
-        uploaded_file2 = st.sidebar.file_uploader("Choose the second file(pth)")
+        uploaded_file1 = st.sidebar.file_uploader("Choose the first file")
+        uploaded_file2 = st.sidebar.file_uploader("Choose the second file")
         feature1,feature2=None,None
         if uploaded_file1 is not None:
-            if 'pth' in uploaded_file1.name:
-                df1=torch.load(uploaded_file1)
-                labels1=df1['label']
-                path1=df1['path']
-                if 'embedding' in df1.keys():
-                    feature1=df1['embedding'].numpy()
-                else:
-                    def clip_cache1(path):
-                        device = "cuda" if torch.cuda.is_available() else "cpu"
-                        model, preprocess = clip.load("ViT-B/32", device=device)
-                        embedding=[]
-                        for i in tqdm(range(len(path))):
-                            image = preprocess(Image.open(path[i])).unsqueeze(0).to(device)
-                            with torch.no_grad():
-                                image_features = model.encode_image(image)
-                                embedding.append(image_features[0].numpy().reshape(1,512))
-                        feature=np.array([embedding[i].reshape(1,-1)[0] for i in range(len(path))])
-                        return feature
-                    clip_cache_st1=st.cache(clip_cache1)
-                    feature1=clip_cache_st1(path1)
+            df1=torch.load(uploaded_file1)
+            labels1=df1['label']
+            path1=df1['path']
+            if 'embedding' in df1.keys():
+              if type(df1['embedding'])==torch.Tensor:
+                feature1=df1['embedding'].numpy()
+              elif type(df1['embedding'])==np.ndarray:
+                feature1=df1['embedding']
+            else:
+                def clip_cache1(path):
+                    device = "cuda" if torch.cuda.is_available() else "cpu"
+                    model, preprocess = clip.load("ViT-B/32", device=device)
+                    embedding=[]
+                    for i in tqdm(range(len(path))):
+                        image = preprocess(Image.open(path[i])).unsqueeze(0).to(device)
+                        with torch.no_grad():
+                            image_features = model.encode_image(image)
+                            embedding.append(image_features[0].numpy().reshape(1,512))
+                    feature=np.array([embedding[i].reshape(1,-1)[0] for i in range(len(path))])
+                    return feature
+                clip_cache_st1=st.cache(clip_cache1)
+                feature1=clip_cache_st1(path1)
 
             # elif 'csv' in uploaded_file1.name:
             #     df1=pd.read_csv(uploaded_file1)
@@ -302,26 +305,28 @@ def mytsne():
             #     feature1=np.array(df1.iloc[:,2:])
             #     path1=df1.iloc[:,0]
         if uploaded_file2 is not None:
-            if 'pth' in uploaded_file2.name:
-                df2=torch.load(uploaded_file2)
-                labels2=df2['label']
-                path2=df2['path']
-                if 'embedding' in df2.keys():
-                    feature2=df2['embedding'].numpy()
-                else:
-                    def clip_cache2(path):
-                        device = "cuda" if torch.cuda.is_available() else "cpu"
-                        model, preprocess = clip.load("ViT-B/32", device=device)
-                        embedding=[]
-                        for i in tqdm(range(len(path))):
-                            image = preprocess(Image.open(path[i])).unsqueeze(0).to(device)
-                            with torch.no_grad():
-                                image_features = model.encode_image(image)
-                                embedding.append(image_features[0].numpy().reshape(1,512))
-                        feature=np.array([embedding[i].reshape(1,-1)[0] for i in range(len(path))])
-                        return feature
-                    clip_cache_st2=st.cache(clip_cache2)
-                    feature2=clip_cache_st2(path2)
+            df2=torch.load(uploaded_file2)
+            labels2=df2['label']
+            path2=df2['path']
+            if 'embedding' in df2.keys():
+              if type(df2['embedding'])==torch.Tensor:
+                feature2=df2['embedding'].numpy()
+              elif type(df2['embedding'])==np.ndarray:
+                feature2=df2['embedding']
+            else:
+                def clip_cache2(path):
+                    device = "cuda" if torch.cuda.is_available() else "cpu"
+                    model, preprocess = clip.load("ViT-B/32", device=device)
+                    embedding=[]
+                    for i in tqdm(range(len(path))):
+                        image = preprocess(Image.open(path[i])).unsqueeze(0).to(device)
+                        with torch.no_grad():
+                            image_features = model.encode_image(image)
+                            embedding.append(image_features[0].numpy().reshape(1,512))
+                    feature=np.array([embedding[i].reshape(1,-1)[0] for i in range(len(path))])
+                    return feature
+                clip_cache_st2=st.cache(clip_cache2)
+                feature2=clip_cache_st2(path2)
             # elif 'csv' in uploaded_file2.name:
             #     df2=pd.read_csv(uploaded_file2)
             #     labels2=np.array(df2.iloc[:,1])

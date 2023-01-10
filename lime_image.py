@@ -79,3 +79,5 @@ def lime_image():
         st.write('''## LIME explaination 5
                     heatmap''')
         st.pyplot(fig)
+    else:
+        st.success('Please select your source data to get start')
