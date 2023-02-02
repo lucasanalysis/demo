@@ -53,8 +53,8 @@ def mycam():
                             cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2,
                             lineType=cv2.LINE_AA)
             return img
-        #model = torch.hub.load('ultralytics/yolov5', 'custom', path=model_path.name)
-        model=torch.hub.load('C:/Users/haomo/checksck/kittidata/yolov5','custom',path=r'C:\Users\haomo\checksck\kittidata\yolov5\runs\train\exp10\weights\best.pt',source='local')
+        model = torch.hub.load('ultralytics/yolov5', 'custom', path=model_path.name)
+        # model=torch.hub.load('C:/Users/haomo/checksck/kittidata/yolov5','custom',path=r'C:\Users\haomo\checksck\kittidata\yolov5\runs\train\exp10\weights\best.pt',source='local')
         model.eval()
         model.cpu()
         target_layers = [model.model.model.model[-2]]
